@@ -49,6 +49,7 @@ Alzheimers_MRI_Classification/
 │   └── README.md                    # Internal doc for executables
 │   
 ├── README.md                        # Root-level project documentation
+├── Project Documentation.pdf        # Project documentation pdf
 └── requirements.txt                 # Root-level environment dependencies
 
 
