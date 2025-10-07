@@ -24,32 +24,33 @@ Alzheimers_MRI_Classification/
 │   │   └── best_model.h5
 │   ├── results/                     # Model Evaluation Outputs
 │   │   └── sample_predictions/
-│   ├── README.md                    # Project documentation
-│   └── requirements.txt             # Python dependencies
-|   ├── data/                        # Data Component
-|   │   ├── raw/                     # Original, unprocessed images
-|   │   │   ├── Mild Demented/
-|   │   │   ├── Moderate Demented/
-|   │   │   ├── Non Demented/
-|   │   │   └── Very Mild Demented/
-|   │   └── preprocessed/            # Cleaned and processed images
-|   │       ├── train/
-|   │       │   ├── Mild Demented/
-|   │       │   ├── Moderate Demented/
-|   │       │   ├── Non Demented/
-|   │       │   └── Very Mild Demented/
-|   │       ├── test/
-|   │       │   ├── Mild Demented/
-|   │       │   ├── Moderate Demented/
-|   │       │   ├── Non Demented/
-|   │       │   └── Very Mild Demented/
-|   │       └── val/
-|   │           ├── Mild Demented/
-|   │           ├── Moderate Demented/
-|   │           ├── Non Demented/
-|   └──         └── Very Mild Demented/
-├── README.md                        # Project documentation
-└── requirements.txt                 # Python dependencies
+│   ├── data/                        # Data Component
+│   │   ├── raw/                     # Original, unprocessed images
+│   │   │   ├── Mild Demented/
+│   │   │   ├── Moderate Demented/
+│   │   │   ├── Non Demented/
+│   │   │   └── Very Mild Demented/
+│   │   └── preprocessed/            # Cleaned and processed images
+│   │       ├── train/
+│   │       │   ├── Mild Demented/
+│   │       │   ├── Moderate Demented/
+│   │       │   ├── Non Demented/
+│   │       │   └── Very Mild Demented/
+│   │       ├── test/
+│   │       │   ├── Mild Demented/
+│   │       │   ├── Moderate Demented/
+│   │       │   ├── Non Demented/
+│   │       │   └── Very Mild Demented/
+│   │       └── val/
+│   │           ├── Mild Demented/
+│   │           ├── Moderate Demented/
+│   │           ├── Non Demented/
+│   │           └── Very Mild Demented/
+│   └── README.md                    # Internal doc for executables
+│   
+├── README.md                        # Root-level project documentation
+└── requirements.txt                 # Root-level environment dependencies
+
 
 
 ```
@@ -78,7 +79,6 @@ Alzheimers_MRI_Classification/
 git clone https://github.com/yourusername/Alzheimers_MRI_Classification.git
 cd Alzheimers_MRI_Classification
 ```
---
 
 **Create virtual environment & activate**
 ```bash
@@ -88,30 +88,25 @@ venv\Scripts\activate
 # Mac/Linux
 source venv/bin/activate
 ```
---
 
 **Install dependencies**
 ```bash
 pip install -r requirements.txt
 ```
---
 
 **Place dataset**
 - Dataset should be under data/preprocessed/ with train & test folders for each class.
 
---
 
 **Train the model (optional if best_model.h5 exists)**
 ```bash
 python Scripts/model_training.py
 ```
---
 
 **Run the Flask app**
 ```bash
 python app.py
 ```
---
 
 **Open in browser**
 - As given local host
@@ -119,7 +114,7 @@ python app.py
 
 ---
 
-##🖥️ Functionalities
+## 🖥️ Functionalities
 - Upload MRI scan (JPG/PNG)
 - View predicted class & confidence score
 - Visualize probability distribution
@@ -128,7 +123,7 @@ python app.py
 
 ---
 
-##📊 Model Details
+## 📊 Model Details
 - Architecture: VGG16 Transfer Learning (base frozen)
 - Input: 224 x 224 x 3 RGB MRI slice
 - Output: Softmax over 4 classes
@@ -138,7 +133,7 @@ python app.py
 - Expected Validation Accuracy: ~97%
 
 ---
-##🗃️ Dataset Overview
+## 🗃️ Dataset Overview
 - Public Alzheimer’s MRI datasets (OASIS, ADNI subsets)
 - Preprocessed into 2D slices, resized to 224x224 pixels
 - Directory structure
@@ -157,14 +152,14 @@ test/
 
 ---
 
-##📈 Insights Summary
+## 📈 Insights Summary
 - Deep learning effectively detects structural brain changes
 - High confidence in Non-Demented vs Severe Demented detection
 - Model useful for early-stage dementia screening
 
 ---
 
-##🌟 Highlights
+## 🌟 Highlights
 - Full-stack AI project with ML + Web App
 - Real-time predictions with confidence & probability bars
 - User-friendly interface for researchers & developers
