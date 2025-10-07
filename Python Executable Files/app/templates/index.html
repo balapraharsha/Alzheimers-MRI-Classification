@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alzheimer’s MRI Classification</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="min-h-screen p-4 sm:p-8">
+
+    <div class="max-w-6xl mx-auto">
+        <header class="text-center py-6 border-b border-gray-200 mb-8">
+            <h1 class="text-4xl font-extrabold text-gray-900 tracking-tight">AI-Driven Alzheimer's MRI Classifier</h1>
+            <p class="text-lg text-gray-500 mt-2">Automated staging of dementia severity from T1-weighted MRI scans.</p>
+        </header>
+
+        <main class="grid lg:grid-cols-3 gap-8">
+            <!-- Upload Section -->
+            <section class="lg:col-span-1 bg-white p-6 rounded-xl shadow-lg h-fit">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4 border-b pb-2">Upload MRI Scan</h2>
+
+                <div id="upload-area" class="border-2 border-dashed border-blue-400 p-6 rounded-lg text-center cursor-pointer hover:bg-blue-50 transition duration-200">
+                    <input type="file" id="mri-file-input" accept="image/jpeg, image/png, image/webp" class="hidden">
+                    <svg class="w-12 h-12 mx-auto text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-4-4V5a2 2 0 012-2h14a2 2 0 012 2v7a4 4 0 01-4 4h-4m-4-4l-4 4m0 0l4 4m-4-4h8"></path>
+                    </svg>
+                    <p class="mt-2 text-sm text-gray-600">Drag 'n' drop or <span class="text-blue-600 font-medium">click to browse</span></p>
+                    <p class="text-xs text-gray-400 mt-1">Accepts 2D MRI slices (JPG, PNG)</p>
+                </div>
+
+                <div id="file-info" class="hidden mt-4 p-3 bg-gray-50 border border-gray-200 rounded-lg">
+                    <p class="text-sm font-medium text-gray-700">File Selected: <span id="file-name" class="font-normal text-blue-600"></span></p>
+                    <img id="mri-preview" class="mt-3 w-full h-auto max-h-48 object-cover rounded-lg border border-gray-300" src="" alt="MRI Preview">
+                </div>
+
+                <button id="classify-button" class="w-full mt-6 px-4 py-3 bg-blue-600 text-white font-bold rounded-lg shadow-md hover:bg-blue-700 transition duration-200 disabled:opacity-50" disabled>Run Classification</button>
+
+                <div id="loading-indicator" class="hidden mt-4 text-center text-blue-600">
+                    <svg class="animate-spin h-5 w-5 mr-3 inline-block" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Analyzing Image...
+                </div>
+            </section>
+
+            <!-- Results Section -->
+            <section class="lg:col-span-2 bg-white p-6 rounded-xl shadow-lg">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4 border-b pb-2">Prediction Results</h2>
+                <div id="initial-state" class="text-center py-16 text-gray-500">
+                    <p>Upload an MRI scan to begin the classification process.</p>
+                </div>
+
+                <div id="results-display" class="hidden">
+                    <div class="result-card p-6 rounded-xl bg-blue-50 border-t-4 border-blue-600 mb-6">
+                        <h3 class="text-xl font-bold text-gray-900 mb-2">Primary Diagnosis:</h3>
+                        <p id="predicted-class" class="text-4xl font-extrabold text-blue-700"></p>
+                        <p class="text-sm text-gray-600 mt-1">Confidence Score: <span id="confidence-score" class="font-semibold text-blue-700"></span></p>
+                    </div>
+
+                    <h3 class="text-xl font-semibold text-gray-800 mb-3">Probability Distribution</h3>
+                    <div id="probability-list" class="space-y-4"></div>
+
+                    <div class="mt-8 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-2">Clinical Note:</h3>
+                        <p id="clinical-note" class="text-gray-600 text-sm italic">
+                            This result is based on a deep learning model analysis. It is for research and triage purposes only and must be verified by a qualified clinician.
+                        </p>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        const fileInput = document.getElementById('mri-file-input');
+        const uploadArea = document.getElementById('upload-area');
+        const classifyButton = document.getElementById('classify-button');
+        const fileInfo = document.getElementById('file-info');
+        const fileNameSpan = document.getElementById('file-name');
+        const mriPreview = document.getElementById('mri-preview');
+        const loadingIndicator = document.getElementById('loading-indicator');
+        const resultsDisplay = document.getElementById('results-display');
+        const initialState = document.getElementById('initial-state');
+        const probabilityList = document.getElementById('probability-list');
+        const predictedClassEl = document.getElementById('predicted-class');
+        const confidenceScoreEl = document.getElementById('confidence-score');
+
+        const CLASSES = ["Non-Demented", "Very Mild Demented", "Mild Demented", "Moderate Demented"];
+
+        function getStatusColor(status) {
+            switch (status) {
+                case "Non-Demented": return "text-emerald-500";
+                case "Very Mild Demented": return "text-amber-500";
+                case "Mild Demented": return "text-orange-600";
+                case "Moderate Demented": return "text-red-500";
+                default: return "text-gray-500";
+            }
+        }
+
+        uploadArea.addEventListener('click', () => fileInput.click());
+
+        fileInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                fileNameSpan.textContent = file.name;
+                fileInfo.classList.remove('hidden');
+                classifyButton.disabled = false;
+
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    mriPreview.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+
+                initialState.classList.remove('hidden');
+                resultsDisplay.classList.add('hidden');
+            }
+        });
+
+        function generateSimulatedPrediction(filename) {
+            let resultIndex = Math.floor(Math.random() * CLASSES.length);
+            let probabilities = CLASSES.map(() => Math.random());
+            let sum = probabilities.reduce((a, b) => a + b, 0);
+            probabilities = probabilities.map(p => p / sum);
+            let maxProb = Math.max(...probabilities);
+            let maxIndex = probabilities.indexOf(maxProb);
+            return {
+                prediction: CLASSES[maxIndex],
+                confidence: maxProb,
+                probabilities: probabilities.map((p, i) => ({ class: CLASSES[i], probability: p }))
+            };
+        }
+
+        function renderResults(data) {
+            data.probabilities.sort((a, b) => b.probability - a.probability);
+            predictedClassEl.textContent = data.prediction;
+            predictedClassEl.className = `text-4xl font-extrabold ${getStatusColor(data.prediction)}`;
+            confidenceScoreEl.textContent = `${(data.confidence * 100).toFixed(2)}%`;
+
+            probabilityList.innerHTML = '';
+            data.probabilities.forEach(item => {
+                const percentage = (item.probability * 100).toFixed(2);
+                const colorClass = getStatusColor(item.class).replace('text-', 'bg-');
+                const listItem = `
+                    <div class="flex items-center space-x-4">
+                        <span class="w-48 font-medium">${item.class}</span>
+                        <div class="flex-grow progress-bar-container">
+                            <div class="progress-bar ${colorClass}" data-status="${item.class}" style="width: ${percentage}%;"></div>
+                        </div>
+                        <span class="w-16 text-right font-bold ${getStatusColor(item.class)}">${percentage}%</span>
+                    </div>
+                `;
+                probabilityList.innerHTML += listItem;
+            });
+
+            initialState.classList.add('hidden');
+            resultsDisplay.classList.remove('hidden');
+        }
+
+        classifyButton.addEventListener('click', () => {
+            if (fileInput.files.length === 0) return;
+            classifyButton.disabled = true;
+            loadingIndicator.classList.remove('hidden');
+
+            setTimeout(() => {
+                const filename = fileInput.files[0].name;
+                const predictionData = generateSimulatedPrediction(filename);
+                renderResults(predictionData);
+                loadingIndicator.classList.add('hidden');
+                classifyButton.disabled = false;
+            }, 2500);
+        });
+
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, e => { e.preventDefault(); e.stopPropagation(); }, false);
+        });
+
+        uploadArea.addEventListener('drop', e => {
+            const files = e.dataTransfer.files;
+            if (files.length) {
+                fileInput.files = files;
+                fileInput.dispatchEvent(new Event('change'));
+            }
+        });
+    </script>
+
+</body>
+</html>

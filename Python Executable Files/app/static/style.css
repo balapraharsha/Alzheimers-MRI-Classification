@@ -1,0 +1,44 @@
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f8fafc; 
+}
+
+.result-card {
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1),
+                0 5px 10px -5px rgba(0, 0, 0, 0.04);
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.result-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 15px 30px -5px rgba(0,0,0,0.15),
+                0 6px 12px -6px rgba(0,0,0,0.06);
+}
+
+.progress-bar-container {
+    height: 10px;
+    border-radius: 9999px; 
+    overflow: hidden;
+    background-color: #e5e7eb; 
+}
+
+.progress-bar {
+    height: 100%;
+    transition: width 1s ease-in-out;
+}
+
+.progress-bar[data-status="Healthy"] {
+    background-color: #10b981; 
+}
+
+.progress-bar[data-status="Disease A"] {
+    background-color: #f59e0b; 
+}
+
+.progress-bar[data-status="Disease B"] {
+    background-color: #f97316;
+}
+
+.progress-bar[data-status="Critical"] {
+    background-color: #ef4444;
+}
