@@ -1,5 +1,5 @@
-Flask==2.3.3
-numpy==1.26.4
-matplotlib==3.8.2
-tensorflow==2.14.0
-Werkzeug==2.3.7
+tensorflow-cpu>=2.16.1
+flask
+gunicorn
+numpy
+Pillow
